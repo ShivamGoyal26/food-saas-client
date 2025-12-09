@@ -24,18 +24,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
- <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}
       >
-     <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <div className="min-h-screen px-4 py-6 md:px-6 md:py-8 lg:px-8 lg:py-10 mx-auto max-w-sm md:max-w-2xl lg:max-w-6xl">
             {children}
-          </ThemeProvider>
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );
