@@ -23,6 +23,7 @@ import { z } from "zod";
 import { useGetCurrentUser, useUpdateProfile } from "../hooks";
 import { UpdateProfileSchema } from "@/schemas/profile";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function UpdateProfile() {
   const { data: user } = useGetCurrentUser();
@@ -32,9 +33,17 @@ export default function UpdateProfile() {
   const form = useForm<z.infer<typeof UpdateProfileSchema>>({
     resolver: zodResolver(UpdateProfileSchema),
     defaultValues: {
-      name: user?.name ?? "",
+      name: "",
     },
   });
+
+  useEffect(() => {
+    if (user?.name) {
+      form.reset({
+        name: user.name,
+      });
+    }
+  }, [user, form]);
 
   const handleSubmit = (payload: z.infer<typeof UpdateProfileSchema>) => {
     form.clearErrors("root");
