@@ -2,12 +2,13 @@
 
 import { Loader2 } from "lucide-react";
 import { useGetCurrentUser } from "./hooks";
+import LoadAddress from "./components/address/components/load-address";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function DashboardPage() {
   const { data, isLoading, isError, error } = useGetCurrentUser();
 
-  console.log("Current User Data:", data);
   return (
     <div>
       <p className="mb-10">Profile Section</p>
@@ -39,15 +40,11 @@ export default function DashboardPage() {
             </div>
           ) : null}
 
-          <div>Address</div>
-          {data?.address ? (
-            <p>{data?.address}</p>
-          ) : (
-            <div className="flex flex-col gap-4">
-              <h1 className="text-red-400">No Address added</h1>
-              <Button>Add Address</Button>
-            </div>
-          )}
+          <LoadAddress addresses={data?.addresses || []} />
+
+          <Link href="/profile/update">
+            <Button>Update Profile</Button>
+          </Link>
         </section>
       )}
     </div>

@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-
 import {
   Card,
   CardContent,
@@ -21,56 +20,78 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Loader2 } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
-import { useCreateAddress } from "../hooks";
 import { AddAddressSchema } from "@/schemas/address";
+import { useUpdateAddress } from "../hooks";
 
-export default function AddAddress() {
+type Props = {
+  address: {
+    _id: string;
+    street: string;
+    city: string;
+    state: string;
+    country: string;
+    pincode: string;
+    primary: boolean;
+    latitude: number;
+    longitude: number;
+  };
+  onClose?: () => void;
+};
+
+export default function UpdateAddress({ address, onClose }: Props) {
   const form = useForm({
     resolver: zodResolver(AddAddressSchema),
     defaultValues: {
-      street: "",
-      city: "",
-      state: "",
-      country: "",
-      pincode: "",
-      primary: false,
-      latitude: 0,
-      longitude: 0,
+      street: address.street,
+      city: address.city,
+      state: address.state,
+      country: address.country,
+      pincode: address.pincode,
+      primary: address.primary,
+      latitude: address.latitude,
+      longitude: address.longitude,
     },
   });
-  const { mutate: createAddress, isPending } = useCreateAddress();
 
-  const handleSubmit = async (payload: z.infer<typeof AddAddressSchema>) => {
+  const { mutate: updateAddress, isPending } = useUpdateAddress();
+
+  const handleSubmit = (payload: z.infer<typeof AddAddressSchema>) => {
     form.clearErrors("root");
-    createAddress(payload, {
-      onSuccess: () => {
-        // refetch the profile data to reflect the new address
-        form.reset();
-        toast.success("Address added successfully");
-      },
-      onError: (error) => {
-        const errorMessage =
-          error.response?.data?.message ||
-          error.response?.data ||
-          "Invalid credentials";
 
-        form.setError("root", {
-          type: "server",
-          message: errorMessage as string,
-        });
-        toast.error(errorMessage as string);
+    updateAddress(
+      {
+        addressId: address._id,
+        payload: payload,
       },
-    });
+      {
+        onSuccess: () => {
+          toast.success("Address updated successfully");
+          onClose?.();
+        },
+        onError: (error: any) => {
+          const errorMessage =
+            error.response?.data?.message ||
+            error.response?.data ||
+            "Failed to update address";
+
+          form.setError("root", {
+            type: "server",
+            message: errorMessage,
+          });
+
+          toast.error(errorMessage);
+        },
+      }
+    );
   };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Add Address</CardTitle>
-        <CardDescription>
-          Add your address to get started right away
-        </CardDescription>
+        <CardTitle>Update Address</CardTitle>
+        <CardDescription>Update your address information</CardDescription>
       </CardHeader>
+
       <CardContent>
         <form onSubmit={form.handleSubmit(handleSubmit)}>
           <FieldGroup className="gap-y-4">
@@ -80,12 +101,7 @@ export default function AddAddress() {
               render={({ field, fieldState }) => (
                 <Field>
                   <FieldLabel>Street</FieldLabel>
-                  <Input
-                    aria-invalid={fieldState.invalid}
-                    placeholder="email/phone"
-                    type="text"
-                    {...field}
-                  />
+                  <Input {...field} aria-invalid={fieldState.invalid} />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
@@ -99,48 +115,35 @@ export default function AddAddress() {
               render={({ field, fieldState }) => (
                 <Field>
                   <FieldLabel>City</FieldLabel>
-                  <Input
-                    aria-invalid={fieldState.invalid}
-                    placeholder="City"
-                    type="text"
-                    {...field}
-                  />
+                  <Input {...field} aria-invalid={fieldState.invalid} />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
                 </Field>
               )}
             />
+
             <Controller
               name="state"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field>
                   <FieldLabel>State</FieldLabel>
-                  <Input
-                    aria-invalid={fieldState.invalid}
-                    placeholder="State"
-                    type="text"
-                    {...field}
-                  />
+                  <Input {...field} aria-invalid={fieldState.invalid} />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
                 </Field>
               )}
             />
+
             <Controller
               name="country"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field>
                   <FieldLabel>Country</FieldLabel>
-                  <Input
-                    aria-invalid={fieldState.invalid}
-                    placeholder="Country"
-                    type="text"
-                    {...field}
-                  />
+                  <Input {...field} aria-invalid={fieldState.invalid} />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
@@ -154,12 +157,7 @@ export default function AddAddress() {
               render={({ field, fieldState }) => (
                 <Field>
                   <FieldLabel>Zip Code</FieldLabel>
-                  <Input
-                    aria-invalid={fieldState.invalid}
-                    placeholder="Pin Code"
-                    type="text"
-                    {...field}
-                  />
+                  <Input {...field} aria-invalid={fieldState.invalid} />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
@@ -177,10 +175,10 @@ export default function AddAddress() {
               {isPending ? (
                 <>
                   <Loader2 className="size-4 animate-spin" />
-                  <span>Loading...</span>
+                  <span>Updating...</span>
                 </>
               ) : (
-                <span>Submit</span>
+                <span>Update</span>
               )}
             </Button>
           </FieldGroup>

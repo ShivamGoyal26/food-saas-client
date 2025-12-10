@@ -6,7 +6,7 @@ export default function AuthLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div suppressHydrationWarning className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen">
       {/* Header with ThemeSwitcher */}
       <header className="flex items-center justify-end">
         <ThemeSwitcher />

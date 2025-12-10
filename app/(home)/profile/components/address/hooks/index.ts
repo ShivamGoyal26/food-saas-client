@@ -8,12 +8,11 @@ import {
   deleteAddress,
   updateAddress,
 } from "../api";
+import { queryKeys } from "@/lib/query-keys";
 
 type ApiError = {
   message: string;
 };
-
-const ADDRESS_QUERY_KEY = ["addresses"];
 
 export const useCreateAddress = () => {
   const queryClient = useQueryClient();
@@ -21,7 +20,7 @@ export const useCreateAddress = () => {
   return useMutation<AddressResponse, AxiosError<ApiError>, AddAddressPayload>({
     mutationFn: createAddress,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ADDRESS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: queryKeys.currentUser });
     },
   });
 };
@@ -37,7 +36,7 @@ export const useUpdateAddress = () => {
     mutationFn: ({ addressId, payload }) =>
       updateAddress({ addressId, payload }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ADDRESS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: queryKeys.currentUser });
     },
   });
 };
@@ -48,7 +47,7 @@ export const useDeleteAddress = () => {
   return useMutation<AddressResponse, AxiosError<ApiError>, string>({
     mutationFn: (addressId) => deleteAddress({ addressId }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ADDRESS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: queryKeys.currentUser });
     },
   });
 };
